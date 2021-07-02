@@ -12,6 +12,7 @@ sealed class NdiSenderEditor : UnityEditor.Editor
     SerializedProperty _captureMethod;
     SerializedProperty _sourceCamera;
     SerializedProperty _sourceTexture;
+    SerializedProperty _syncMode;
 
     static class Styles
     {
@@ -26,6 +27,7 @@ sealed class NdiSenderEditor : UnityEditor.Editor
         _captureMethod = finder["_captureMethod"];
         _sourceCamera = finder["_sourceCamera"];
         _sourceTexture = finder["_sourceTexture"];
+        _syncMode = finder["_syncMode"];
     }
 
     public override void OnInspectorGUI()
@@ -63,6 +65,7 @@ sealed class NdiSenderEditor : UnityEditor.Editor
             EditorGUILayout.PropertyField(_sourceTexture);
 
         EditorGUI.indentLevel--;
+        EditorGUILayout.PropertyField(_syncMode);
 
         serializedObject.ApplyModifiedProperties();
 

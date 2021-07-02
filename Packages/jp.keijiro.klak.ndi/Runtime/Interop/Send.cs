@@ -28,11 +28,13 @@ public class Send : SafeHandleZeroOrMinusOneIsInvalid
         Marshal.FreeHGlobal(cname);
         return ptr;
     }
-
+        
+    public void SendVideo(in VideoFrame data)
+      => _SendVideo(this, data);
     public void SendVideoAsync(in VideoFrame data)
       => _SendVideoAsync(this, data);
 
-    public bool SetTally(out Tally tally, uint timeout)
+        public bool SetTally(out Tally tally, uint timeout)
       => _SetTally(this, out tally, timeout);
 
     #endregion
@@ -54,10 +56,12 @@ public class Send : SafeHandleZeroOrMinusOneIsInvalid
     [DllImport(Config.DllName, EntryPoint = "NDIlib_send_destroy")]
     static extern void _Destroy(IntPtr send);
 
-    [DllImport(Config.DllName, EntryPoint = "NDIlib_send_send_video_async_v2")]
-    static extern void _SendVideoAsync(Send send, in VideoFrame data);
+        [DllImport(Config.DllName, EntryPoint = "NDIlib_send_send_video_v2")]
+        static extern void _SendVideo(Send send, in VideoFrame data);
 
-    [DllImport(Config.DllName, EntryPoint = "NDIlib_send_get_tally")]
+
+        [DllImport(Config.DllName, EntryPoint = "NDIlib_send_send_video_async_v2")]
+        static extern void _SendVideoAsync(Send send, in VideoFrame data);[DllImport(Config.DllName, EntryPoint = "NDIlib_send_get_tally")]
     [return: MarshalAs(UnmanagedType.U1)]
     static extern bool _SetTally(Send send, out Tally tally, uint timeout);
 

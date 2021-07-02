@@ -12,6 +12,7 @@ public sealed partial class NdiSender : MonoBehaviour
     int _width, _height;
     Interop.Send _send;
     FormatConverter _converter;
+    bool _isSendingReady = true;
     MetadataQueue _metadataQueue = new MetadataQueue();
     System.Action<AsyncGPUReadbackRequest> _onReadback;
 
@@ -110,14 +111,24 @@ public sealed partial class NdiSender : MonoBehaviour
         var converted = _converter.Encode
           (cb, source, _width, _height, _enableAlpha, true);
 
-        // GPU readback request
-        cb.RequestAsyncReadback(converted, _onReadback);
+            // GPU readback request
+        if (_isSendingReady)
+        {
+            cb.RequestAsyncReadback(converted, _onReadback);
+        }
         _metadataQueue.Enqueue(metadata);
     }
 
     #endregion
 
     #region GPU readback completion callback
+    //Send via NDI with sync-coroutine
+    System.Collections.IEnumerator SendPseudoAsync(Interop.VideoFrame frame)
+        {
+            _send.SendVideo(frame);
+            _isSendingReady = true;
+            yield break;
+        }
 
     unsafe void OnReadback(AsyncGPUReadbackRequest request)
     {
@@ -150,8 +161,16 @@ public sealed partial class NdiSender : MonoBehaviour
                 FrameFormat = Interop.FrameFormat.Progressive,
                 Data = (System.IntPtr)pdata, Metadata = metadata };
 
-            // Send via NDI
-            _send.SendVideoAsync(frame);
+            switch (_syncMode)
+            {
+                case SenderSyncMode.Async:
+                    _send.SendVideoAsync(frame);
+                    break;
+                case SenderSyncMode.PseudoAsync:
+                        _isSendingReady = false;
+                        StartCoroutine(SendPseudoAsync(frame));
+                    break;
+            }
         }
     }
 

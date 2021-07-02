@@ -3,6 +3,7 @@ using UnityEngine;
 namespace Klak.Ndi {
 
 public enum CaptureMethod { GameView, Camera, Texture }
+public enum SenderSyncMode {Async,PseudoAsync}
 
 public sealed partial class NdiSender : MonoBehaviour
 {
@@ -42,6 +43,12 @@ public sealed partial class NdiSender : MonoBehaviour
       { get => _sourceTexture;
         set => _sourceTexture = value; }
 
+    [SerializeField] SenderSyncMode _syncMode = SenderSyncMode.Async;
+    public SenderSyncMode syncMode
+        {
+            get => _syncMode;
+            set => _syncMode = value;
+        }
     #endregion
 
     #region Runtime property
